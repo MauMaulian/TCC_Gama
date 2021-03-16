@@ -1,0 +1,146 @@
+﻿-- MySQL Workbench Synchronization
+-- Generated: 2019-07-30 21:47
+-- Model: New Model
+-- Version: 1.0
+-- Project: Name of the project
+-- Author: Informática
+
+SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+
+ALTER SCHEMA `onixdev`  DEFAULT CHARACTER SET utf8  DEFAULT COLLATE utf8_general_ci ;
+
+CREATE TABLE IF NOT EXISTS `onixdev`.`nota_fiscal` (
+  `id_nota_fiscal` INT(11) NOT NULL AUTO_INCREMENT,
+  `data_compra` DATE NOT NULL,
+  `data_entrega` DATE NOT NULL,
+  `valor_total` FLOAT(11) NOT NULL,
+  `fornecedor` INT(11) NOT NULL,
+  `funcionario` INT(11) NOT NULL,
+  PRIMARY KEY (`id_nota_fiscal`),
+  INDEX `fk_nota_fiscal_fornecedor_idx` (`fornecedor` ASC) VISIBLE,
+  INDEX `fk_nota_fiscal_funcionario1_idx` (`funcionario` ASC) VISIBLE,
+  CONSTRAINT `fk_nota_fiscal_fornecedor`
+    FOREIGN KEY (`fornecedor`)
+    REFERENCES `onixdev`.`fornecedor` (`id_fornecedor`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_nota_fiscal_funcionario1`
+    FOREIGN KEY (`funcionario`)
+    REFERENCES `onixdev`.`funcionario` (`id_funcionario`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+CREATE TABLE IF NOT EXISTS `onixdev`.`produto` (
+  `id_produto` INT(11) NOT NULL AUTO_INCREMENT,
+  `nome_produto` VARCHAR(45) NOT NULL,
+  `quantidade_minima` INT(11) NOT NULL,
+  `descricao_produto` TINYTEXT NOT NULL,
+  PRIMARY KEY (`idproduto`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+CREATE TABLE IF NOT EXISTS `onixdev`.`estoque` (
+  `id_estoque` INT(11) NOT NULL AUTO_INCREMENT,
+  `produto` INT(11) NOT NULL,
+  PRIMARY KEY (`id_estoque`, `produto`),
+  INDEX `fk_estoque_produto1_idx` (`produto` ASC) VISIBLE,
+  CONSTRAINT `fk_estoque_produto1`
+    FOREIGN KEY (`produto`)
+    REFERENCES `onixdev`.`produto` (`idproduto`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+CREATE TABLE IF NOT EXISTS `onixdev`.`requisicao_produto` (
+  `id_requisicao_produto` INT(11) NOT NULL AUTO_INCREMENT,
+  `quantidade_requisicao` FLOAT(11) NOT NULL,
+  `data_requisicao` DATE NOT NULL,
+  `produto` INT(11) NOT NULL,
+  `funcionario` INT(11) NOT NULL,
+  PRIMARY KEY (`id_requisicao_produto`),
+  INDEX `fk_requisicao_produto_produto1_idx` (`produto` ASC) VISIBLE,
+  INDEX `fk_requisicao_produto_funcionario1_idx` (`funcionario` ASC) VISIBLE,
+  CONSTRAINT `fk_requisicao_produto_produto1`
+    FOREIGN KEY (`produto`)
+    REFERENCES `onixdev`.`produto` (`idproduto`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_requisicao_produto_funcionario1`
+    FOREIGN KEY (`funcionario`)
+    REFERENCES `onixdev`.`funcionario` (`id_funcionario`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+CREATE TABLE IF NOT EXISTS `onixdev`.`funcionario` (
+  `id_funcionario` INT(11) NOT NULL AUTO_INCREMENT,
+  `nome_funcionario` VARCHAR(45) NOT NULL,
+  `setor_funcionario` VARCHAR(45) NOT NULL,
+  `email_funcionario` VARCHAR(45) NOT NULL,
+  `data_nascimento_funcionario` DATE NOT NULL,
+  `senha` VARCHAR(45) NOT NULL,
+  `token` VARCHAR(64) NOT NULL,
+  `nivel` INT(11) NOT NULL,
+  PRIMARY KEY (`id_funcionario`),
+  UNIQUE INDEX `senha_UNIQUE` (`senha` ASC) VISIBLE,
+  INDEX `fk_funcionario_nivel1_idx` (`nivel` ASC) VISIBLE,
+  CONSTRAINT `fk_funcionario_nivel1`
+    FOREIGN KEY (`nivel`)
+    REFERENCES `onixdev`.`nivel` (`id_nivel`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+CREATE TABLE IF NOT EXISTS `onixdev`.`produto_nota_fiscal` (
+  `id_produto_nota_fiscal` INT(11) NOT NULL AUTO_INCREMENT,
+  `quantidade_produto` INT(11) NOT NULL,
+  `valor_unitario` FLOAT(11) NOT NULL,
+  `produto` INT(11) NOT NULL,
+  `nota_fiscal` INT(11) NOT NULL,
+  PRIMARY KEY (`id_produto_nota_fiscal`),
+  INDEX `fk_produto_nota_fiscal_produto1_idx` (`produto` ASC) VISIBLE,
+  INDEX `fk_produto_nota_fiscal_nota_fiscal1_idx` (`nota_fiscal` ASC) VISIBLE,
+  CONSTRAINT `fk_produto_nota_fiscal_produto1`
+    FOREIGN KEY (`produto`)
+    REFERENCES `onixdev`.`produto` (`idproduto`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_produto_nota_fiscal_nota_fiscal1`
+    FOREIGN KEY (`nota_fiscal`)
+    REFERENCES `onixdev`.`nota_fiscal` (`id_nota_fiscal`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+CREATE TABLE IF NOT EXISTS `onixdev`.`fornecedor` (
+  `id_fornecedor` INT(11) NOT NULL AUTO_INCREMENT,
+  `cnpj` VARCHAR(19) NOT NULL,
+  `nome_fornecedor` VARCHAR(45) NOT NULL,
+  `rua` VARCHAR(45) NOT NULL,
+  `numero` INT(11) NOT NULL,
+  `bairro` VARCHAR(60) NOT NULL,
+  `municipio` VARCHAR(50) NOT NULL,
+  `estado` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`id_fornecedor`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+CREATE TABLE IF NOT EXISTS `onixdev`.`nivel` (
+  `id_nivel` INT(11) NOT NULL AUTO_INCREMENT,
+  `descricao` TINYTEXT NOT NULL,
+  PRIMARY KEY (`id_nivel`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
